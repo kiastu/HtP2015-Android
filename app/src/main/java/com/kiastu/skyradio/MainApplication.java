@@ -15,9 +15,12 @@ import com.parse.SaveCallback;
 public class MainApplication extends Application {
     private static String APP_ID = "tvBeInNQqHmjKJXP2gaaS3LVENcqSFhZyUL1rGrJ";
     private static String CLIENT_ID = "H972ZNgtz6OZVIdyBYUn7EmpHnxHKfuMqU0HgVRh";
+    //    public static String HOME_BASE = "http://allupinyour.space";
+    public static String HOME_BASE = "http://e6c30700.ngrok.io";
+
 
     @Override
-    public void onCreate(){
+    public void onCreate() {
         super.onCreate();
         Parse.initialize(this, APP_ID, CLIENT_ID);
         //subscribe
@@ -31,5 +34,6 @@ public class MainApplication extends Application {
                 }
             }
         });
+        new SuperQueue(this);//initialize the superqueue
     }
 }
