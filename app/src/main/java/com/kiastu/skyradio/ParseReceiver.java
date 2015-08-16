@@ -21,11 +21,12 @@ public class ParseReceiver extends ParsePushBroadcastReceiver {
 
     @Override
     protected void onPushReceive(Context context, Intent intent){
-        super.onPushReceive(context,intent);
+//        super.onPushReceive(context,intent);
         Intent newIntent = new Intent(context,MainActivity.class);
-        intent.setAction(MediaStore.ACTION_IMAGE_CAPTURE);
-        context.sendBroadcast(newIntent);
-        return;
+        newIntent.setAction(MediaStore.ACTION_IMAGE_CAPTURE);
+        newIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_SINGLE_TOP);
+        Log.d("ParseReceiver","Intent fired");
+        context.startActivity(newIntent);
     }
 }
 

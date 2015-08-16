@@ -3,10 +3,13 @@ package com.kiastu.skyradio;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.hardware.Camera;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.util.Base64;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -14,6 +17,9 @@ import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.Toast;
 
+import com.parse.ParseObject;
+
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -56,26 +62,6 @@ public class MainActivity extends Activity {
 
                 }
             });
-//            Button button = (Button) findViewById(R.id.take_picture);
-//            button.setOnClickListener(new View.OnClickListener() {
-//                @Override
-//                public void onClick(View view) {
-//                    mCamera.takePicture(null, null,mPicture);
-//                }
-//            });
-
-            String path = Environment.getExternalStorageDirectory() + "/" + "test.jpg";
-            Log.d("File path:",path);
-            File file = new File(path);
-            if (!file.exists()) {
-                try {
-                    file.createNewFile();
-                    Log.d("File Saved", "The file was saved properly!");
-                } catch (IOException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                }
-            }
 
         }
 
@@ -132,7 +118,7 @@ public class MainActivity extends Activity {
                 fos.write(data);
                 fos.close();
                 //if nothing went wrong... to base camp!
-                sendImageToBase(pictureFile);
+                saveDataToParse(pictureFile);
             } catch (FileNotFoundException e) {
                 Log.d(DEBUG_TAG, "File not found: " + e.getMessage());
             } catch (IOException e) {
@@ -183,20 +169,34 @@ public class MainActivity extends Activity {
         List<Camera.Size> sizes = params.getSupportedPictureSizes();
         params.setPictureSize(sizes.get(5).width, sizes.get(5).height);
         //find all of the sizes.
-        for(Camera.Size size : sizes){
-            Log.d("Size","Available Size => Width: "+size.width+" Height: "+size.height);
-        }
+//        for(Camera.Size size : sizes){
+//            Log.d("Size","Available Size => Width: "+size.width+" Height: "+size.height);
+//        }
         mCamera.setParameters(params);
     }
     @Override
     public void onNewIntent(Intent intent){
+        Log.d("MainActivity","Intent received");
         String action = intent.getAction();
         if(action.equals(MediaStore.ACTION_IMAGE_CAPTURE)){
             //correct intent, take a picture.
             mCamera.takePicture(null, null, mPicture);
         }
     }
-    private void sendImageToBase(File file){
+    private void saveDataToParse(File file){
+        //convert the image in to base64
+        Bitmap bm = BitmapFactory.decodeFile(file.getAbsolutePath());
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+//        bm.compress(Bitmap.CompressFormat.JPEG, 100, baos); //bm is the bitmap object
+        byte[] byteArrayImage = baos.toByteArray();
+        String encodedImage = Base64.encodeToString(byteArrayImage, Base64.DEFAULT);
+        Log.d("MainActivity","Saving encoded image:"+encodedImage);
+
+        //save the data
+        ParseObject snapshot = new ParseObject("Snapshot");
+        snapshot.add("name",file.getName());
+        snapshot.add("image",encodedImage);
+        snapshot.saveInBackground();
 
     }
 }

@@ -21,7 +21,6 @@ public class MainApplication extends Application {
         super.onCreate();
         Parse.initialize(this, APP_ID, CLIENT_ID);
         //subscribe
-
         ParsePush.subscribeInBackground("", new SaveCallback() {
             @Override
             public void done(ParseException e) {
